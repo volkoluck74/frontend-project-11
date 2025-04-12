@@ -51,6 +51,8 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.5",
-    "npm-check-updates": "^16.6.2"
+    "npm-check-updates": "^16.6.2",
+    "valtio": "^2.1.4",
+    "yup": "^1.6.1"
   }
 }
