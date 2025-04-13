@@ -1,38 +1,27 @@
 import * as yup from 'yup';
-import { proxy,subscribe, snapshot } from 'valtio/vanilla';
+//import { proxy,subscribe, snapshot } from 'valtio/vanilla';
+import {watcherValidateInput} from './view.js';
+
 
 export default function app () {
     const form = document.querySelector('form');
-    const input = document.querySelector('input');
-
-    const state = proxy({
+    const state = {
         data: {
             urls: [],
         },
         uiState: {
             validateInput: true,
         },
-    });
-    subscribe(state, () => {
-        render();
-    });
-    function render() {
-        input.classList.remove();
-        if (state.uiState.validateInput) {
-            input.classList.remove('is-invalid');
-            input.classList.add('w-100', 'form-control')
-            input.value = '';
-        }
-        else input.classList.add('is-invalid','w-100', 'form-control');
-    }
+    };
+    let watchedValidateInput= watcherValidateInput(state);
     function validateNewUrl(url) {
         schema.isValid(url).then(isValid => {
-            if (isValid && state.data.urls.indexOf(url) === -1) {
-                state.data.urls.push(url);
-                state.uiState.validateInput = true;
+            if (isValid && watchedValidateInput.data.urls.indexOf(url) === -1) {
+                watchedValidateInput.data.urls.push(url);
+                watchedValidateInput.uiState.validateInput = true;
             }
             else {
-                state.uiState.validateInput = false;
+                watchedValidateInput.uiState.validateInput = false;
             }
         })
     }
@@ -43,5 +32,4 @@ export default function app () {
         const newUrl = formData.get('url');
         validateNewUrl(newUrl);
       });
-      //render();
 }

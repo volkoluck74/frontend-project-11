@@ -52,6 +52,7 @@
   "dependencies": {
     "bootstrap": "^5.3.5",
     "npm-check-updates": "^16.6.2",
+    "on-change": "^5.0.1",
     "valtio": "^2.1.4",
     "yup": "^1.6.1"
   }
