@@ -15,21 +15,22 @@ export default function app () {
     };
     let watchedValidateInput= watcherValidateInput(state);
     function validateNewUrl(url) {
+        const schema = yup.string().url('first test').notOneOf(state.data.urls); 
         schema.isValid(url).then(isValid => {
-            if (isValid && watchedValidateInput.data.urls.indexOf(url) === -1) {
+            if (isValid) {
                 watchedValidateInput.data.urls.push(url);
                 watchedValidateInput.uiState.validateInput = true;
             }
             else {
                 watchedValidateInput.uiState.validateInput = false;
             }
-        })
-    }
-    const schema = yup.string().url().min(1); 
+        });
+    };
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(form);
         const newUrl = formData.get('url');
         validateNewUrl(newUrl);
+        //console.log(arr)
       });
 }
