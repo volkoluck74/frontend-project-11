@@ -1,6 +1,17 @@
 import onChange from 'on-change';
+import i18next from 'i18next';
+import ru from './locales/ru.js'
 
-export function watcherValidateInput (state) {
+const i18nextInstance = i18next.createInstance();
+await i18nextInstance.init({
+    lng: 'ru',
+    debug: true,
+    resources: {
+        ru
+    },
+});
+
+export  function watcherValidateInput (state) {
     const inputEl = document.querySelector('input');
     const messageEl = document.querySelector('.feedback');
     function setInvalidClass(el) {
@@ -24,13 +35,13 @@ export function watcherValidateInput (state) {
             setValidClass(inputEl);
             setTextSuccess(messageEl)
             inputEl.value = '';
-            messageEl.textContent = state.uiState.inputMessage;
         }
         else {
             setInvalidClass(inputEl);
             setTextDanger(messageEl);
-            messageEl.textContent = state.uiState.inputMessage;
+            
         }
+        messageEl.textContent = i18nextInstance.t(`${state.uiState.inputMessage}`);
     };
     const watchedObject = onChange(state, render);
     return watchedObject;

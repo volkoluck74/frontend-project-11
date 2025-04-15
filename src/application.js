@@ -1,28 +1,24 @@
 import * as yup from 'yup';
 import {watcherValidateInput} from './view.js';
-import i18next from 'i18next';
-import ru from './locales/ru.js'
-//import axios from 'axios';
+import axios from 'axios';
+import _ from 'lodash';
 
 export default async function app () {
+
     const form = document.querySelector('form');
     const state = {
         data: {
             urls: [],
+            feeds: [],
+
         },
         uiState: {
             validateInput: true,
+            hasFeeds: false,
             inputMessage: '',
         },
     };
-    const i18nextInstance = i18next.createInstance();
-    await i18nextInstance.init({
-        lng: 'ru',
-        debug: true,
-        resources: {
-          ru
-        },
-      });
+    
     yup.setLocale({
         mixed: {
             notOneOf: () => ({key: 'errors.input.urlAlrdeadyAdded'}),
@@ -32,17 +28,44 @@ export default async function app () {
         }
     });
     let watchedValidateInput= watcherValidateInput(state);
+    function getResponse(url) {
+        return axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(`${url}`)}`);
+     }
+ 
+     function getXML(response) {
+         const parser = new DOMParser();
+         return parser.parseFromString(response.data.contents, "text/xml");
+     };
+     function getError(error) {
+         console.error('Ошибка:', error);
+     };
     function validateNewUrl(url) {
-        const schema = yup.string().url().notOneOf(state.data.urls);
+        const schema = yup.string().url().notOneOf(state.data.urls.map(item => item.url));
         schema.validate(url, {abortEarly: false})
         .then((e)=>{
-            watchedValidateInput.data.urls.push(url);
+            const urlUid = _.uniqueId();
+            watchedValidateInput.data.urls.push({uid: urlUid, url});
             watchedValidateInput.uiState.validateInput = true;
-            watchedValidateInput.uiState.inputMessage = i18nextInstance.t('success.input.urlAdded');
+            watchedValidateInput.uiState.inputMessage = 'success.input.urlAdded';
+            
+            getResponse(url).then(response => {
+                const doc = getXML(response);
+                const title = doc.querySelector('channel title');
+                const description  = doc.querySelector('channel description');
+                watchedValidateInput.data.feeds.push({
+                    uid: _.uniqueId(),
+                    urlUid,
+                    title: title.textContent,
+                    description: description.textContent,
+                });
+                //if (watchedValidateInput.data.feeds.length > 0) watchedValidateInput.uiState.hasFeeds = true;
+            }).catch(err => console.log(err));
+            
+            
         })
         .catch(err => {
             watchedValidateInput.uiState.validateInput = false;
-            watchedValidateInput.uiState.inputMessage = i18nextInstance.t(`${err.message.key}`);
+            watchedValidateInput.uiState.inputMessage = err.message.key;
             
         });
     };
