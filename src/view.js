@@ -1,15 +1,36 @@
 import onChange from 'on-change';
 
 export function watcherValidateInput (state) {
-    const input = document.querySelector('input');
+    const inputEl = document.querySelector('input');
+    const messageEl = document.querySelector('.feedback');
+    function setInvalidClass(el) {
+        el.classList.remove('is-valid');
+        el.classList.add('is-invalid');
+    }
+    function setValidClass(el) {
+        el.classList.remove('is-invalid');
+        el.classList.add('is-valid');
+    }
+    function setTextDanger(el) {
+        el.classList.remove('text-success');
+        el.classList.add('text-danger');
+    }
+    function setTextSuccess(el) {
+        el.classList.remove('text-danger');
+        el.classList.add('text-success');
+    }
     function render() {
-        input.classList.remove();
         if (state.uiState.validateInput) {
-            input.classList.remove('is-invalid');
-            input.classList.add('w-100', 'form-control')
-            input.value = '';
+            setValidClass(inputEl);
+            setTextSuccess(messageEl)
+            inputEl.value = '';
+            messageEl.textContent = state.uiState.inputMessage;
         }
-        else input.classList.add('is-invalid','w-100', 'form-control');
+        else {
+            setInvalidClass(inputEl);
+            setTextDanger(messageEl);
+            messageEl.textContent = state.uiState.inputMessage;
+        }
     };
     const watchedObject = onChange(state, render);
     return watchedObject;
