@@ -10,6 +10,11 @@ export default {
         input: {
             urlAdded: 'RSS успешно загружен',
         }
+    },
+    elements: {
+      headers: {
+        feeds: 'Посты',
+      }
     }
   },
 };

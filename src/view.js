@@ -11,9 +11,14 @@ await i18nextInstance.init({
     },
 });
 
+const inputEl = document.querySelector('input');
+const messageEl = document.querySelector('.feedback');
+const feedsEl = document.querySelector('.feeds');
+
+
+
+
 export  function watcherValidateInput (state) {
-    const inputEl = document.querySelector('input');
-    const messageEl = document.querySelector('.feedback');
     function setInvalidClass(el) {
         el.classList.remove('is-valid');
         el.classList.add('is-invalid');
@@ -30,7 +35,7 @@ export  function watcherValidateInput (state) {
         el.classList.remove('text-danger');
         el.classList.add('text-success');
     }
-    function render() {
+    function renderInput() {
         if (state.uiState.validateInput) {
             setValidClass(inputEl);
             setTextSuccess(messageEl)
@@ -39,10 +44,29 @@ export  function watcherValidateInput (state) {
         else {
             setInvalidClass(inputEl);
             setTextDanger(messageEl);
-            
         }
         messageEl.textContent = i18nextInstance.t(`${state.uiState.inputMessage}`);
     };
+    function renderFeeds() {
+        if (state.uiState.hasFeeds) {
+            const divFirst = document.createElement('div');
+            divFirst.classList.add('card', 'border-0');
+            feedsEl.appendChild(divFirst);
+    
+            const divSecond = document.createElement('div');
+            divSecond.classList.add('card-body');
+            divFirst.appendChild(divSecond);
+    
+            const h2 = document.createElement('h2');
+            h2.classList.add('card-title', 'h4');
+            h2.textContent = i18nextInstance.t(`elements.headers.feeds`);
+            divSecond.appendChild(h2);
+        }
+    };
+    function render() {
+        renderInput();
+        renderFeeds();
+    }
     const watchedObject = onChange(state, render);
     return watchedObject;
 };

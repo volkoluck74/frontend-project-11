@@ -58,7 +58,7 @@ export default async function app () {
                     title: title.textContent,
                     description: description.textContent,
                 });
-                //if (watchedValidateInput.data.feeds.length > 0) watchedValidateInput.uiState.hasFeeds = true;
+                if (watchedValidateInput.data.feeds.length > 0) watchedValidateInput.uiState.hasFeeds = true;
             }).catch(err => console.log(err));
             
             
