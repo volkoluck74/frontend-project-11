@@ -10,11 +10,12 @@ export default async function app () {
         data: {
             urls: [],
             feeds: [],
+            posts: [],
 
         },
         uiState: {
             validateInput: true,
-            hasFeeds: false,
+            hasContent: false,
             inputMessage: '',
         },
     };
@@ -52,13 +53,25 @@ export default async function app () {
                 const doc = getXML(response);
                 const title = doc.querySelector('channel title');
                 const description  = doc.querySelector('channel description');
+                const feedUid = _.uniqueId();
                 watchedValidateInput.data.feeds.push({
-                    uid: _.uniqueId(),
+                    uid: feedUid,
                     urlUid,
                     title: title.textContent,
                     description: description.textContent,
                 });
-                if (watchedValidateInput.data.feeds.length > 0) watchedValidateInput.uiState.hasFeeds = true;
+                const posts = doc.querySelectorAll('channel item');
+                posts.forEach(item => {
+                    watchedValidateInput.data.posts.push({
+                        uid: _.uniqueId(),
+                        urlUid,
+                        feedUid,
+                        title: item.querySelector('title').textContent,
+                        description: item.querySelector('description').textContent,
+                        href: item.querySelector('link').textContent,
+                    });
+                });
+                if (watchedValidateInput.data.feeds.length > 0) watchedValidateInput.uiState.hasContent = true;
             }).catch(err => console.log(err));
             
             
@@ -69,15 +82,6 @@ export default async function app () {
             
         });
     };
-    /*
-    axios.get('https://jsonplaceholder.typicode.com/posts/1')
-        .then(response => {
-            console.log(response.data);
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-    });
-    */
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(form);

@@ -13,7 +13,11 @@ export default {
     },
     elements: {
       headers: {
-        feeds: 'Посты',
+        feeds: 'Фиды',
+        posts: 'Посты',
+      },
+      buttons: {
+        postsButton: 'Просмотр',
       }
     }
   },
