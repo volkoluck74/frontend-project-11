@@ -1,15 +1,15 @@
 export default {
   translation: {
     errors: {
-        input: {
-            urlAlrdeadyAdded: 'RSS уже существует',
-            urlIsInvalid: 'Ссылка должна быть валидным URL'
-        },
+      input: {
+        urlAlrdeadyAdded: 'RSS уже существует',
+        urlIsInvalid: 'Ссылка должна быть валидным URL',
+      },
     },
     success: {
-        input: {
-            urlAdded: 'RSS успешно загружен',
-        }
+      input: {
+        urlAdded: 'RSS успешно загружен',
+      },
     },
     elements: {
       headers: {
@@ -18,7 +18,7 @@ export default {
       },
       buttons: {
         postsButton: 'Просмотр',
-      }
-    }
+      },
+    },
   },
 };
