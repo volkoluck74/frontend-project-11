@@ -48,7 +48,38 @@ export default async function app() {
     console.error('Ошибка:', error);
   }
 */
-  setTimeout(() => console.log('Apchi'), 10000);
+  function updatePosts() {
+    setTimeout(() => {
+      if (watchedValidateInput.uiState.hasContent) {
+        watchedValidateInput.data.feeds.forEach((feed) => {
+          const currentPosts = state.data.posts.filter((post) => post.feedUid === feed.uid);
+          const { url } = state.data.urls.filter((item) => item.uid === feed.urlUid)[0];
+          getResponse(url).then((response) => {
+            const doc = getXML(response);
+            const posts = doc.querySelectorAll('channel item');
+            posts.forEach((item) => {
+              const newPost = {
+                title: item.querySelector('title').textContent,
+                description: item.querySelector('description').textContent,
+                href: item.querySelector('link').textContent,
+              };
+              if (currentPosts.filter((post) => post.title === newPost.title
+                && post.description === newPost.description
+                && post.href === newPost.href).length === 0) {
+                newPost.uid = _.uniqueId;
+                newPost.feedUid = feed.uid;
+                watchedValidateInput.data.posts.unshift(newPost);
+              }
+            });
+          }).catch((err) => console.log(err));
+        });
+      } else {
+        console.log('false');
+      }
+      updatePosts();
+    }, 5000);
+  }
+  updatePosts();
   function validateNewUrl(url) {
     const schema = yup.string().url().notOneOf(state.data.urls.map((item) => item.url));
     schema.validate(url, { abortEarly: false })
