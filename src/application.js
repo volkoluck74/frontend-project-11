@@ -27,9 +27,16 @@ export default async function app() {
       url: () => ({ key: 'errors.input.urlIsInvalid' }),
     },
   });
+
+  function createProxy(proxy, url) {
+    const href = new URL('/get', proxy);
+    href.searchParams.append('disableCache', 'true');
+    href.searchParams.append('url', url);
+    return href;
+  }
   const watchedValidateInput = watcherValidateInput(state);
   function getResponse(url) {
-    return axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(`${url}`)}`);
+    return axios.get(createProxy('https://allorigins.hexlet.app', url));
   }
 
   function getXML(response) {
@@ -41,6 +48,7 @@ export default async function app() {
     console.error('Ошибка:', error);
   }
 */
+  setTimeout(() => console.log('Apchi'), 10000);
   function validateNewUrl(url) {
     const schema = yup.string().url().notOneOf(state.data.urls.map((item) => item.url));
     schema.validate(url, { abortEarly: false })
