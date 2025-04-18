@@ -106,7 +106,8 @@ export default function watcherValidateInput(state) {
         ulEl.append(liEl);
 
         const a = document.createElement('a');
-        a.classList.add('fw-bold');
+        if (state.uiState.viewedPosts.filter((filterItem) => item.uid === filterItem).length !== 0) a.classList.add('fw-normal', 'link-secondary');
+        else a.classList.add('fw-bold');
         a.setAttribute('href', `${item.href}`);
         a.setAttribute('data-id', `${item.uid}`);
         a.setAttribute('target', '_blank');
@@ -122,6 +123,21 @@ export default function watcherValidateInput(state) {
         button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
         button.textContent = i18nextInstance.t('elements.buttons.postsButton');
         liEl.appendChild(button);
+        button.addEventListener('click', () => {
+          const modalDialog = document.querySelector('.modal-dialog');
+          const h5 = modalDialog.querySelector('.modal-title');
+          h5.textContent = item.title;
+
+          const divModalBody = modalDialog.querySelector('.modal-body');
+          divModalBody.textContent = item.description;
+
+          const aModal = modalDialog.querySelector('a');
+          aModal.href = item.href;
+          if (state.uiState.viewedPosts.filter((element) => element === item.uid).length === 0) {
+            state.uiState.viewedPosts.push(item.uid);
+            renderPosts();
+          }
+        });
       });
     }
   }

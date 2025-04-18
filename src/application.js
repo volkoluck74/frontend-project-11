@@ -16,6 +16,7 @@ export default async function app() {
       validateInput: true,
       hasContent: false,
       inputMessage: '',
+      viewedPosts: [],
     },
   };
 
