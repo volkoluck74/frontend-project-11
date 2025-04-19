@@ -4,6 +4,8 @@ export default {
       input: {
         urlAlrdeadyAdded: 'RSS уже существует',
         urlIsInvalid: 'Ссылка должна быть валидным URL',
+        notFoundRss: 'Ресурс не содержит валидный RSS',
+        networkError: 'Ошибка сети',
       },
     },
     success: {

@@ -67,7 +67,12 @@ export default async function app() {
                 watchedValidateInput.data.posts.unshift(newPost);
               }
             });
-          }).catch((err) => console.log(err));
+          }).catch((err) => {
+            if (err.message === 'Network Error') {
+              watchedValidateInput.uiState.validateInput = false;
+              watchedValidateInput.uiState.inputMessage = 'errors.input.networkError';
+            }
+          });
         });
       }
       updatePosts();
@@ -111,9 +116,14 @@ export default async function app() {
               watchedValidateInput.uiState.hasContent = true;
             }
           })
-          .catch(() => {
+          .catch((err) => {
             watchedValidateInput.uiState.validateInput = false;
-            watchedValidateInput.uiState.inputMessage = 'errors.input.urlIsInvalid';
+            if (err.message === 'Network Error') {
+              watchedValidateInput.uiState.inputMessage = 'errors.input.networkError';
+            }
+            if (err.message === 'title is null') {
+              watchedValidateInput.uiState.inputMessage = 'errors.input.notFoundRss';
+            }
           });
       })
       .catch((err) => {
