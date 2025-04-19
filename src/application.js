@@ -88,32 +88,32 @@ export default async function app() {
             const urlUid = _.uniqueId();
             const doc = getXML(response);
             const title = doc.querySelector('channel title');
-            if (title === null) throw new Error("title is null");
+            if (title === null) throw new Error('title is null');
             const description = doc.querySelector('channel description');
-              const feedUid = _.uniqueId();
-              watchedValidateInput.data.urls.push({ uid: urlUid, url });
-              watchedValidateInput.uiState.validateInput = true;
-              watchedValidateInput.uiState.inputMessage = 'success.input.urlAdded';
-              watchedValidateInput.data.feeds.push({
-                uid: feedUid,
+            const feedUid = _.uniqueId();
+            watchedValidateInput.data.urls.push({ uid: urlUid, url });
+            watchedValidateInput.uiState.validateInput = true;
+            watchedValidateInput.uiState.inputMessage = 'success.input.urlAdded';
+            watchedValidateInput.data.feeds.push({
+              uid: feedUid,
+              urlUid,
+              title: title.textContent,
+              description: description.textContent,
+            });
+            const posts = doc.querySelectorAll('channel item');
+            posts.forEach((item) => {
+              watchedValidateInput.data.posts.push({
+                uid: _.uniqueId(),
                 urlUid,
-                title: title.textContent,
-                description: description.textContent,
+                feedUid,
+                title: item.querySelector('title').textContent,
+                description: item.querySelector('description').textContent,
+                href: item.querySelector('link').textContent,
               });
-              const posts = doc.querySelectorAll('channel item');
-              posts.forEach((item) => {
-                watchedValidateInput.data.posts.push({
-                  uid: _.uniqueId(),
-                  urlUid,
-                  feedUid,
-                  title: item.querySelector('title').textContent,
-                  description: item.querySelector('description').textContent,
-                  href: item.querySelector('link').textContent,
-                });
-              });
-              if (watchedValidateInput.data.feeds.length > 0) {
-                watchedValidateInput.uiState.hasContent = true;
-              }
+            });
+            if (watchedValidateInput.data.feeds.length > 0) {
+              watchedValidateInput.uiState.hasContent = true;
+            }
           })
           .catch((err) => {
             watchedValidateInput.uiState.validateInput = false;
