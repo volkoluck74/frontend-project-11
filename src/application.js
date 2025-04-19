@@ -44,11 +44,6 @@ export default async function app() {
     const parser = new DOMParser();
     return parser.parseFromString(response.data.contents, 'text/xml');
   }
-  /*
-  function getError(error) {
-    console.error('Ошибка:', error);
-  }
-*/
   function updatePosts() {
     setTimeout(() => {
       if (watchedValidateInput.uiState.hasContent) {
@@ -74,8 +69,6 @@ export default async function app() {
             });
           }).catch((err) => console.log(err));
         });
-      } else {
-        console.log('false');
       }
       updatePosts();
     }, 5000);
@@ -85,37 +78,43 @@ export default async function app() {
     const schema = yup.string().url().notOneOf(state.data.urls.map((item) => item.url));
     schema.validate(url, { abortEarly: false })
       .then(() => {
-        const urlUid = _.uniqueId();
-        watchedValidateInput.data.urls.push({ uid: urlUid, url });
-        watchedValidateInput.uiState.validateInput = true;
-        watchedValidateInput.uiState.inputMessage = 'success.input.urlAdded';
+        getResponse(url)
+          .then((response) => {
+            const urlUid = _.uniqueId();
+            watchedValidateInput.data.urls.push({ uid: urlUid, url });
+            watchedValidateInput.uiState.validateInput = true;
+            watchedValidateInput.uiState.inputMessage = 'success.input.urlAdded';
 
-        getResponse(url).then((response) => {
-          const doc = getXML(response);
-          const title = doc.querySelector('channel title');
-          const description = doc.querySelector('channel description');
-          const feedUid = _.uniqueId();
-          watchedValidateInput.data.feeds.push({
-            uid: feedUid,
-            urlUid,
-            title: title.textContent,
-            description: description.textContent,
-          });
-          const posts = doc.querySelectorAll('channel item');
-          posts.forEach((item) => {
-            watchedValidateInput.data.posts.push({
-              uid: _.uniqueId(),
+            const doc = getXML(response);
+            const title = doc.querySelector('channel title');
+            const description = doc.querySelector('channel description');
+            const feedUid = _.uniqueId();
+            watchedValidateInput.data.feeds.push({
+              uid: feedUid,
               urlUid,
-              feedUid,
-              title: item.querySelector('title').textContent,
-              description: item.querySelector('description').textContent,
-              href: item.querySelector('link').textContent,
+              title: title.textContent,
+              description: description.textContent,
             });
+
+            const posts = doc.querySelectorAll('channel item');
+            posts.forEach((item) => {
+              watchedValidateInput.data.posts.push({
+                uid: _.uniqueId(),
+                urlUid,
+                feedUid,
+                title: item.querySelector('title').textContent,
+                description: item.querySelector('description').textContent,
+                href: item.querySelector('link').textContent,
+              });
+            });
+            if (watchedValidateInput.data.feeds.length > 0) {
+              watchedValidateInput.uiState.hasContent = true;
+            }
+          })
+          .catch(() => {
+            watchedValidateInput.uiState.validateInput = false;
+            watchedValidateInput.uiState.inputMessage = 'errors.input.urlIsInvalid';
           });
-          if (watchedValidateInput.data.feeds.length > 0) {
-            watchedValidateInput.uiState.hasContent = true;
-          }
-        }).catch((err) => console.log(err));
       })
       .catch((err) => {
         watchedValidateInput.uiState.validateInput = false;
