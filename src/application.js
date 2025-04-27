@@ -2,6 +2,24 @@ import * as yup from 'yup'
 import axios from 'axios'
 import _ from 'lodash'
 import watcherValidateInput from './view.js'
+import i18next from 'i18next'
+import ru from './locales/ru.js'
+
+const i18n = i18next.createInstance()
+await i18n.init({
+  lng: 'ru',
+  debug: true,
+  resources: {
+    ru,
+  },
+})
+
+const elements = {
+  inputEl: document.querySelector('input'),
+  messageEl: document.querySelector('.feedback'),
+  feedsEl: document.querySelector('.feeds'),
+  postsEl: document.querySelector('.posts'),
+}
 
 export default async function app() {
   const form = document.querySelector('form')
@@ -35,7 +53,7 @@ export default async function app() {
     href.searchParams.append('url', url)
     return href
   }
-  const watchedValidateInput = watcherValidateInput(state)
+  const watchedValidateInput = watcherValidateInput(i18n, elements, state)
   function getResponse(url) {
     return axios.get(createProxy('https://allorigins.hexlet.app', url))
   }

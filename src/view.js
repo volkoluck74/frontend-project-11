@@ -1,22 +1,12 @@
 import onChange from 'on-change'
-import i18next from 'i18next'
-import ru from './locales/ru.js'
-
+/*
 const inputEl = document.querySelector('input')
 const messageEl = document.querySelector('.feedback')
 const feedsEl = document.querySelector('.feeds')
 const postsEl = document.querySelector('.posts')
-
-const i18nextInstance = i18next.createInstance()
-await i18nextInstance.init({
-  lng: 'ru',
-  debug: true,
-  resources: {
-    ru,
-  },
-})
-
-export default function watcherValidateInput(state) {
+*/
+export default function watcherValidateInput(i18n, elements, state) {
+  const { inputEl, messageEl, feedsEl, postsEl } = elements
   function setInvalidClass(el) {
     el.classList.remove('is-valid')
     el.classList.add('is-invalid')
@@ -43,7 +33,7 @@ export default function watcherValidateInput(state) {
       setInvalidClass(inputEl)
       setTextDanger(messageEl)
     }
-    messageEl.textContent = i18nextInstance.t(`${state.uiState.inputMessage}`)
+    messageEl.textContent = i18n.t(`${state.uiState.inputMessage}`)
   }
   function renderFeeds() {
     if (state.uiState.hasContent) {
@@ -58,7 +48,7 @@ export default function watcherValidateInput(state) {
 
       const h2 = document.createElement('h2')
       h2.classList.add('card-title', 'h4')
-      h2.textContent = i18nextInstance.t('elements.headers.feeds')
+      h2.textContent = i18n.t('elements.headers.feeds')
       divSecond.appendChild(h2)
 
       const ulEl = document.createElement('ul')
@@ -95,7 +85,7 @@ export default function watcherValidateInput(state) {
 
       const h2 = document.createElement('h2')
       h2.classList.add('card-title', 'h4')
-      h2.textContent = i18nextInstance.t('elements.headers.posts')
+      h2.textContent = i18n.t('elements.headers.posts')
       divSecond.appendChild(h2)
 
       const ulEl = document.createElement('ul')
@@ -122,7 +112,7 @@ export default function watcherValidateInput(state) {
         button.setAttribute('data-bs-toggle', 'modal')
         button.setAttribute('data-bs-target', '#modal')
         button.classList.add('btn', 'btn-outline-primary', 'btn-sm')
-        button.textContent = i18nextInstance.t('elements.buttons.postsButton')
+        button.textContent = i18n.t('elements.buttons.postsButton')
         liEl.appendChild(button)
         button.addEventListener('click', () => {
           const modalDialog = document.querySelector('.modal-dialog')
