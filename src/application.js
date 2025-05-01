@@ -19,22 +19,25 @@ const elements = {
   messageEl: document.querySelector('.feedback'),
   feedsEl: document.querySelector('.feeds'),
   postsEl: document.querySelector('.posts'),
+  modalDialog: document.querySelector('.modal-dialog'),
+  modalDialogCloseButton: document.querySelector('.modal-footer').querySelector('button'),
 }
 
 export default async function app() {
   const form = document.querySelector('form')
   const state = {
-    data: {
-      urls: [],
-      feeds: [],
-      posts: [],
-
-    },
     uiState: {
       validateInput: true,
       hasContent: false,
       inputMessage: '',
       viewedPosts: [],
+      viewingPost: '',
+      modalDialogState: 'close',
+    },
+    data: {
+      urls: [],
+      feeds: [],
+      posts: [],
     },
   }
 
@@ -97,6 +100,7 @@ export default async function app() {
     }, 5000)
   }
   updatePosts()
+
   function validateNewUrl(url) {
     const schema = yup.string().url().notOneOf(state.data.urls.map(item => item.url))
     schema.validate(url, { abortEarly: false })

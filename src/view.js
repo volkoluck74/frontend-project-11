@@ -1,30 +1,34 @@
 import onChange from 'on-change'
-/*
-const inputEl = document.querySelector('input')
-const messageEl = document.querySelector('.feedback')
-const feedsEl = document.querySelector('.feeds')
-const postsEl = document.querySelector('.posts')
-*/
+
 export default function watcherValidateInput(i18n, elements, state) {
-  const { inputEl, messageEl, feedsEl, postsEl } = elements
+  const { inputEl, messageEl, feedsEl, postsEl, modalDialog, modalDialogCloseButton } = elements
+
+  modalDialogCloseButton.addEventListener('click', () => {
+    watchedObject.uiState.modalDialogState = 'close'
+  })
+  // При ошибки валидации
   function setInvalidClass(el) {
     el.classList.remove('is-valid')
     el.classList.add('is-invalid')
   }
+  // При успешной валидации
   function setValidClass(el) {
     el.classList.remove('is-invalid')
     el.classList.add('is-valid')
   }
+  // Окраска текста при ошибке
   function setTextDanger(el) {
     el.classList.remove('text-success')
     el.classList.add('text-danger')
   }
+  // Окраска текста при успехе
   function setTextSuccess(el) {
     el.classList.remove('text-danger')
     el.classList.add('text-success')
   }
+  // Отрисовка инпута в зависимости от валидации
   function renderInput() {
-    if (state.uiState.validateInput) {
+    if (watchedObject.uiState.validateInput) {
       setValidClass(inputEl)
       setTextSuccess(messageEl)
       inputEl.value = ''
@@ -33,10 +37,11 @@ export default function watcherValidateInput(i18n, elements, state) {
       setInvalidClass(inputEl)
       setTextDanger(messageEl)
     }
-    messageEl.textContent = i18n.t(`${state.uiState.inputMessage}`)
+    messageEl.textContent = i18n.t(`${watchedObject.uiState.inputMessage}`)
   }
+  // Отрисовка блока с фидами, в зависимости от наличия контента
   function renderFeeds() {
-    if (state.uiState.hasContent) {
+    if (watchedObject.uiState.hasContent) {
       feedsEl.childNodes.forEach(item => item.remove())
       const divFirst = document.createElement('div')
       divFirst.classList.add('card', 'border-0')
@@ -71,9 +76,18 @@ export default function watcherValidateInput(i18n, elements, state) {
       })
     }
   }
-
+  // Отрисовка диалогового окна
+  function renderModal() {
+    const post = watchedObject.data.posts.filter(item => item.uid === watchedObject.uiState.viewingPost)
+    if (post.length !== 0) {
+      modalDialog.querySelector('.modal-title').textContent = post[0].title
+      modalDialog.querySelector('.modal-body').textContent = post[0].description
+      modalDialog.querySelector('a').href = post[0].href
+    }
+  }
+  // Отрисовка постов в зависимости от наличия контента
   function renderPosts() {
-    if (state.uiState.hasContent) {
+    if (watchedObject.uiState.hasContent) {
       postsEl.childNodes.forEach(item => item.remove())
       const divFirst = document.createElement('div')
       divFirst.classList.add('card', 'border-0')
@@ -115,18 +129,10 @@ export default function watcherValidateInput(i18n, elements, state) {
         button.textContent = i18n.t('elements.buttons.postsButton')
         liEl.appendChild(button)
         button.addEventListener('click', () => {
-          const modalDialog = document.querySelector('.modal-dialog')
-          const h5 = modalDialog.querySelector('.modal-title')
-          h5.textContent = item.title
-
-          const divModalBody = modalDialog.querySelector('.modal-body')
-          divModalBody.textContent = item.description
-
-          const aModal = modalDialog.querySelector('a')
-          aModal.href = item.href
-          if (state.uiState.viewedPosts.filter(element => element === item.uid).length === 0) {
-            state.uiState.viewedPosts.push(item.uid)
-            renderPosts()
+          watchedObject.uiState.modalDialogState = 'open'
+          watchedObject.uiState.viewingPost = item.uid
+          if (watchedObject.uiState.viewedPosts.filter(element => element === item.uid).length === 0) {
+            watchedObject.uiState.viewedPosts.push(item.uid)
           }
         })
       })
@@ -136,6 +142,7 @@ export default function watcherValidateInput(i18n, elements, state) {
     renderInput()
     renderFeeds()
     renderPosts()
+    renderModal()
   }
   const watchedObject = onChange(state, render)
   return watchedObject
