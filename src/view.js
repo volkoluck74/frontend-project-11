@@ -44,6 +44,7 @@ export default function watcherValidateInput(i18n, elements, state) {
     if (watchedObject.uiState.processApp === 'waiting') {
       setValidClass(inputEl)
       setTextSuccess(messageEl)
+      inputEl.value = ''
     }
     messageEl.textContent = i18n.t(`${watchedObject.uiState.inputMessage}`)
   }

@@ -116,6 +116,7 @@ export default async function app() {
             const doc = getXML(response)
             const title = doc.querySelector('channel title')
             if (title === null) {
+              console.log('BOOOm')
               throw new Error('title is null')
             }
             const description = doc.querySelector('channel description')
