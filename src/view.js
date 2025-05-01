@@ -1,7 +1,7 @@
 import onChange from 'on-change'
 
 export default function watcherValidateInput(i18n, elements, state) {
-  const { inputEl, messageEl, feedsEl, postsEl, modalDialog, modalDialogCloseButton } = elements
+  const { inputEl, messageEl, feedsEl, postsEl, modalDialog, modalDialogCloseButton, buttonAddUrl } = elements
 
   modalDialogCloseButton.addEventListener('click', () => {
     watchedObject.uiState.modalDialogState = 'close'
@@ -26,22 +26,30 @@ export default function watcherValidateInput(i18n, elements, state) {
     el.classList.remove('text-danger')
     el.classList.add('text-success')
   }
-  // Отрисовка инпута в зависимости от валидации
-  function renderInput() {
-    if (watchedObject.uiState.validateInput) {
-      setValidClass(inputEl)
-      setTextSuccess(messageEl)
-      inputEl.value = ''
+  // Блокировка кнопки добавления новых фидов в момент добавления
+  function renderButton() {
+    if (watchedObject.uiState.processApp === 'addition') {
+      buttonAddUrl.disabled = true
     }
     else {
+      buttonAddUrl.disabled = false
+    }
+  }
+  // Отрисовка инпута в зависимости от статуса
+  function renderInput() {
+    if (watchedObject.uiState.processApp === 'error') {
       setInvalidClass(inputEl)
       setTextDanger(messageEl)
     }
+    if (watchedObject.uiState.processApp === 'waiting') {
+      setValidClass(inputEl)
+      setTextSuccess(messageEl)
+    }
     messageEl.textContent = i18n.t(`${watchedObject.uiState.inputMessage}`)
   }
-  // Отрисовка блока с фидами, в зависимости от наличия контента
+  // Отрисовка блока с фидами
   function renderFeeds() {
-    if (watchedObject.uiState.hasContent) {
+    if (watchedObject.data.posts.length > 0) {
       feedsEl.childNodes.forEach(item => item.remove())
       const divFirst = document.createElement('div')
       divFirst.classList.add('card', 'border-0')
@@ -85,9 +93,9 @@ export default function watcherValidateInput(i18n, elements, state) {
       modalDialog.querySelector('a').href = post[0].href
     }
   }
-  // Отрисовка постов в зависимости от наличия контента
+  // Отрисовка постов
   function renderPosts() {
-    if (watchedObject.uiState.hasContent) {
+    if (watchedObject.data.posts.length > 0) {
       postsEl.childNodes.forEach(item => item.remove())
       const divFirst = document.createElement('div')
       divFirst.classList.add('card', 'border-0')
@@ -139,6 +147,7 @@ export default function watcherValidateInput(i18n, elements, state) {
     }
   }
   function render() {
+    renderButton()
     renderInput()
     renderFeeds()
     renderPosts()
