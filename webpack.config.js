@@ -1,5 +1,6 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 /* eslint-enx node */
+/* global process */
 
 import path from 'path'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
