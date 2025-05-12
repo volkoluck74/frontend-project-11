@@ -50,7 +50,9 @@ function updatePosts(watchedValidateInput) {
     if (watchedValidateInput.uiState.processApp !== 'waitingFirstFeed') {
       watchedValidateInput.data.feeds.forEach(feed => checkFeed(feed, watchedValidateInput))
     }
-    updatePosts(watchedValidateInput)
+    if (watchedValidateInput.uiState.processApp !== 'addition') {
+      updatePosts(watchedValidateInput)
+    }
   }, 5000)
 }
 // Валидация url
@@ -60,9 +62,9 @@ function validateURL(url, watchedValidateInput) {
 }
 // Получение контента для нового url
 function getContentOfNewURL(url, watchedValidateInput) {
+  watchedValidateInput.uiState.processApp = 'addition'
   validateURL(url, watchedValidateInput)
     .then(() => {
-      watchedValidateInput.uiState.processApp = 'addition'
       getResponse(url)
         .then((response) => {
           const urlUid = _.uniqueId()
