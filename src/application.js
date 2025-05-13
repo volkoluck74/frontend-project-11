@@ -2,7 +2,7 @@ import * as yup from 'yup'
 import axios from 'axios'
 import _ from 'lodash'
 import watcherValidateInput from './view.js'
-import parseItem from './parseItem.js'
+import getParsingResponse from './getParsingResponse.js'
 
 // Создаем проксированную ссылку
 function createProxy(proxy, url) {
@@ -20,21 +20,23 @@ function getXML(response) {
   const parser = new DOMParser()
   return parser.parseFromString(response.data.contents, 'text/xml')
 }
+// Проверяем, является ли пост новым
+function isNewPost(currentPosts, post) {
+  return currentPosts.filter((oldPost) => {
+    return oldPost.title === post.title && oldPost.description === post.description && oldPost.href === post.href
+  }).length === 0
+}
 // Проверяем каждый фид и получаем новые посты
 function checkFeed(feed, watchedValidateInput) {
   const currentPosts = watchedValidateInput.data.posts.filter(post => post.feedUid === feed.uid)
   const { url } = watchedValidateInput.data.urls.filter(item => item.uid === feed.urlUid)[0]
   getResponse(url).then((response) => {
-    const doc = getXML(response)
-    const posts = doc.querySelectorAll('channel item')
-    posts.forEach((item) => {
-      const newPost = parseItem(item)
-      if (currentPosts.filter(post => post.title === newPost.title
-        && post.description === newPost.description
-        && post.href === newPost.href).length === 0) {
-        newPost.uid = _.uniqueId
-        newPost.feedUid = feed.uid
-        watchedValidateInput.data.posts.unshift(newPost)
+    const posts = getParsingResponse(response)
+    posts.forEach((post) => {
+      if (isNewPost(currentPosts, post)) {
+        post.uid = _.uniqueId()
+        post.feedUid = feed.uid
+        watchedValidateInput.data.posts.unshift(post)
       }
     })
   }).catch((err) => {
@@ -71,7 +73,6 @@ function getContentOfNewURL(url, watchedValidateInput) {
           const doc = getXML(response)
           const title = doc.querySelector('channel title')
           if (title === null) {
-            console.log('BOOOm')
             throw new Error('title is null')
           }
           const description = doc.querySelector('channel description')
@@ -112,6 +113,7 @@ function getContentOfNewURL(url, watchedValidateInput) {
       watchedValidateInput.uiState.inputMessage = err.message.key
     })
 }
+
 export default async function app(i18n, elements) {
   const form = document.querySelector('form')
   const state = {
